@@ -1,2 +1,6 @@
 #!/bin/bash
+<<<<<<< HEAD
 mkdir /tmp/6-firstdirectory
+=======
+pwd
+>>>>>>> d8cb424f93edbb018082bdcc4e535e7cfdb90dd1
