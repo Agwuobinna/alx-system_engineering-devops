@@ -1,7 +1,6 @@
-# Client configuration file (w/ Puppet)
-
-file{'/etc/ssh/ssh_config':
-  ensure  => 'file',
-  content => 'IdentitiesOnly yes
-IdentityFile ~/.ssh/school'
+# Changes SSH config file
+exec { 'echo':
+  path    => 'usr/bin:/bin',
+  command => 'echo "    IdentityFile ~/.ssh/school\n    PasswordAuthentication no" >> /etc/ssh/ssh_config',
+  returns => [0,1],
 }
