@@ -1,36 +1,33 @@
 #!/usr/bin/python3
-"""
-using this REST API, for a given employee ID, returns information
-about his/her TODO list progress.
-"""
-import requests
+""" Gather data from an API """
 import sys
+import requests
 
+if __name__ == "__main__":
+    wb = "https://jsonplaceholder.typicode.com/users" + "/" + sys.argv[1]
+    reqnameid = requests.get(wb).json()
 
-def main():
-    """Entry point"""
-    user_id = sys.argv[1]
-    res = requests.get("https://jsonplaceholder.typicode.com/user/{}/todos".
-                       format(user_id))
-    res1 = requests.get("https://jsonplaceholder.typicode.com/users/{}".
-                        format(user_id))
-    if res.status_code == 200 and res1.status_code == 200:
-        tasks = res.json()
-        user = res1.json()
-        completed_tasks = []
-        total_completed = 0
-        total_tasks = 0
+    if reqnameid.get("id") == int(sys.argv[1]):
+        name = reqnameid.get("name")
 
-        for task in tasks:
-            if task.get('completed'):
-                total_completed += 1
-                completed_tasks.append(task)
-            total_tasks += 1
-        print("Employee {} is done with tasks({:d}/{:d}):".
-              format(user.get('name'), total_completed, total_tasks))
-        for task in completed_tasks:
-            print("\t {}".format(task.get('title')))
+    wb = "https://jsonplaceholder.typicode.com/todos?userId=" + sys.argv[1]
+    req = requests.get(wb).json()
 
+    done_task = 0
+    total_task = 0
+    title = []
 
-if __name__ == '__main__':
-    main()
+    for my_dict in req:
+        ti = my_dict.get("title")
+        title.append(ti)
+        for key, value in my_dict.items():
+            if key == "completed":
+                if value is True:
+                    done_task += 1
+                total_task += 1
+
+    print("Employee {:s} is done with tasks({:d}/{:d})"
+          .format(name, done_task, total_task))
+
+    for line in title:
+        print("\t {:s}".format(line))

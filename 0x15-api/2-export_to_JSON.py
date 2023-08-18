@@ -1,35 +1,49 @@
 #!/usr/bin/python3
-"""
-using this REST API, for a given employee ID, returns information
-about his/her TODO list progress.
-"""
-import json
-import requests
+""" Gather data from an API """
 import sys
+import os
+import requests
+import csv
+import json
 
+if __name__ == "__main__":
+    wb = "https://jsonplaceholder.typicode.com/users" + "/" + sys.argv[1]
+    reqnameid = requests.get(wb).json()
 
-def main():
-    """Entry point"""
-    user_id = sys.argv[1]
-    res = requests.get("https://jsonplaceholder.typicode.com/user/{}/todos".
-                       format(user_id))
-    res1 = requests.get("https://jsonplaceholder.typicode.com/users/{}".
-                        format(user_id))
-    if res.status_code == 200 and res1.status_code == 200:
-        tasks = res.json()
-        user = res1.json()
-        filename = "{}.json".format(user_id)
-        user_tasks = {user_id: []}
-        for task in tasks:
-            data = {
-                    'task':  task.get('title'),
-                    'completed': task.get('completed'),
-                    'username': user.get('username'),
-            }
-            user_tasks[user_id].append(data)
-        with open(filename, 'w') as fp:
-            json.dump(user_tasks, fp)
+    if reqnameid.get("id") == int(sys.argv[1]):
+        name = reqnameid.get("name")
 
+    wb = "https://jsonplaceholder.typicode.com/todos?userId=" + sys.argv[1]
+    req = requests.get(wb).json()
 
-if __name__ == '__main__':
-    main()
+    done_task = 0
+    total_task = 0
+    title = []
+    did_task = []
+
+    for my_dict in req:
+        ti = my_dict.get("title")
+        title.append(ti)
+        for key, value in my_dict.items():
+            if key == "completed":
+                if value is True:
+                    done_task += 1
+                did_task.append(value)
+                total_task += 1
+
+    user_id = reqnameid.get("id")
+    name_File = str(user_id) + ".csv"
+
+    my_Data = []
+
+    for i in range(len(title)):
+        my_Data = []
+        my_Data.append(str(user_id))
+        my_Data.append(name)
+        my_Data.append(did_task[i])
+        my_Data.append(title[i])
+
+        with open(name_File, 'a') as f:
+            tex = csv.writer(f, delimiter=',',
+                             quoting=csv.QUOTE_ALL)
+            tex.writerow(my_Data)
